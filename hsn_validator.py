@@ -17,8 +17,8 @@ class HSNValidator:
         """Loads the master data from an Excel file."""
         try:
             df = pd.read_excel(self.data_file_path, dtype=str)
-            print("Columns in the dataframe:", df.columns)  # Debugging line
-            df.columns = df.columns.str.strip()  # Clean up any spaces in column names
+            print("Columns in the dataframe:", df.columns)  
+            df.columns = df.columns.str.strip()  
         
             if 'HSNCode' not in df.columns:
                 raise KeyError('HSNCode column is missing in the dataset.')
@@ -39,14 +39,14 @@ class HSNValidator:
         Returns:
             dict: Validation result with valid status and additional info
         """
-        # Basic format validation
+    
         if not hsn_code.isdigit():
             return {'valid': False, 'reason': 'Invalid format: HSN code must contain only digits'}
 
         if len(hsn_code) not in [2, 4, 6, 8]:
             return {'valid': False, 'reason': 'Invalid format: HSN code must be 2, 4, 6, or 8 digits long'}
 
-        # Exact match validation
+        
         exact_match = self.df[self.df['HSNCode'] == hsn_code]
         if not exact_match.empty:
             return {
@@ -55,9 +55,9 @@ class HSNValidator:
                 'validation_type': 'exact_match'
             }
 
-        # Hierarchical validation for longer codes
+        
         if len(hsn_code) > 2:
-            # Check parent codes
+            
             parent_codes = [hsn_code[:i] for i in range(2, len(hsn_code) + 1, 2)]
             for parent in parent_codes:
                 parent_match = self.df[self.df['HSNCode'] == parent]
@@ -69,7 +69,7 @@ class HSNValidator:
                         'parent_code': parent
                     }
 
-        # No match found
+        
         return {'valid': False, 'reason': 'Code not found in master data'}
 
     def validate_multiple_hsn_codes(self, hsn_codes):
